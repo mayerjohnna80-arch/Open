@@ -1,0 +1,18 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="OPEN app icon">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#161122"/>
+      <stop offset="1" stop-color="#0B0910"/>
+    </linearGradient>
+    <linearGradient id="markGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F7802E"/>
+      <stop offset="1" stop-color="#8B4CF0"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="114" fill="url(#bgGrad)"/>
+  <g transform="translate(256,256)">
+    <circle cx="0" cy="0" r="150" fill="none" stroke="url(#markGrad)" stroke-width="19" opacity="0.4"/>
+    <circle cx="0" cy="0" r="100" fill="none" stroke="url(#markGrad)" stroke-width="21" opacity="0.7"/>
+    <circle cx="0" cy="0" r="39" fill="url(#markGrad)"/>
+  </g>
+</svg>

@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OPEN — Player Registration</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#0B0910;           /* page background */
+    --panel:#161122;        /* cards / panels */
+    --line:#2A2440;         /* hairline / border */
+    --input-bg:#080610;     /* input background */
+    --ink:#F5F2F8;          /* main text */
+    --mute:#9A90AD;         /* muted text */
+    --orange:#F7802E;
+    --purple:#8B4CF0;
+    --grad:linear-gradient(100deg,var(--orange),var(--purple));
+    --gold:#E8C05A;         /* admin marker */
+    --red:#E5644E;
+    --radius:15px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; }
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif; line-height:1.55; min-height:100vh;
+  }
+  .disp{ font-family:'Barlow Condensed',sans-serif; letter-spacing:.01em; }
+  button{ font-family:inherit; cursor:pointer; }
+  a{ color:var(--orange); }
+  input:focus, button:focus-visible, select:focus{ outline:2px solid var(--orange); outline-offset:2px; }
+
+  /* top bar */
+  header.top{
+    display:flex; align-items:center; gap:13px; padding:14px 24px;
+    border-bottom:1px solid var(--line); background:rgba(11,9,16,.85);
+    backdrop-filter:blur(8px); position:sticky; top:0; z-index:20;
+  }
+  .crest{
+    width:40px; height:40px; flex:none;
+    display:grid; place-items:center;
+  }
+  .club-name{ font-size:20px; font-weight:700; line-height:1; font-family:'Barlow Condensed',sans-serif; }
+  .club-name .lc{ color:var(--ink); }
+  .club-name .ac{ background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .club-sub{ font-size:10.5px; color:var(--mute); letter-spacing:.18em; text-transform:uppercase; margin-top:2px; }
+  .top-right{ margin-left:auto; display:flex; align-items:center; gap:12px; }
+  .whoami{ font-size:13px; color:var(--mute); text-align:right; }
+  .whoami b{ color:var(--ink); }
+  .rolebadge{ display:inline-block; font-size:10px; font-weight:700; letter-spacing:.08em;
+    text-transform:uppercase; padding:2px 7px; border-radius:20px; margin-left:6px; }
+  .rolebadge.admin{ background:var(--gold); color:var(--bg); }
+  .rolebadge.parent{ background:var(--grad); color:#fff; }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:7px; border:none; border-radius:11px;
+    padding:12px 20px; font-weight:600; font-size:14px; background:var(--grad);
+    color:#fff; transition:transform .05s, filter .15s;
+  }
+  .btn:hover{ filter:brightness(1.07); }
+  .btn:active{ transform:translateY(1px); }
+  .btn.ghost{ background:transparent; border:1px solid var(--line); color:var(--ink); }
+  .btn.ghost:hover{ border-color:var(--purple); filter:none; }
+  .btn.ghost.onpaper{ border-color:var(--line); color:var(--ink); }
+  .btn.ghost.onpaper:hover{ border-color:var(--purple); }
+  .btn.sm{ padding:8px 14px; font-size:13px; border-radius:9px; }
+  .btn.block{ width:100%; justify-content:center; }
+  .btn.danger{ background:transparent; border:1px solid var(--red); color:var(--red); }
+  .btn.gold{ background:var(--gold); color:var(--bg); }
+
+  .wrap{ max-width:1060px; margin:0 auto; padding:28px 24px 64px; }
+
+  /* ---- HERO ---- */
+  .hero{ position:relative; overflow:hidden; border-bottom:1px solid var(--line); }
+  .hero::before{ /* glow motif */
+    content:""; position:absolute; right:-160px; top:-120px; width:520px; height:520px;
+    border:2px solid rgba(247,128,46,.14); border-radius:50%;
+  }
+  .hero::after{
+    content:""; position:absolute; right:-40px; bottom:-260px; width:420px; height:420px;
+    border:2px solid rgba(139,76,240,.12); border-radius:50%;
+  }
+  .hero-inner{ max-width:1060px; margin:0 auto; padding:64px 24px 54px; position:relative; z-index:1; }
+  .eyebrow{ display:inline-flex; align-items:center; gap:9px; font-size:12px; letter-spacing:.18em;
+    text-transform:uppercase; color:var(--orange); font-weight:600; margin-bottom:18px; }
+  .eyebrow::before{ content:""; width:26px; height:2px; background:var(--grad); }
+  .hero h1{ font-size:clamp(44px,7.5vw,80px); line-height:.92; margin:0 0 18px; font-weight:700; }
+  .hero h1 em{ font-style:normal; background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero p{ font-size:17px; color:var(--mute); max-width:540px; margin:0 0 28px; }
+  .hero-cta{ display:flex; gap:12px; flex-wrap:wrap; }
+  .season-tag{ position:absolute; top:40px; right:28px; z-index:1; text-align:right;
+    font-family:'Barlow Condensed',sans-serif; }
+  .season-tag .yr{ font-size:52px; font-weight:700; line-height:.85;
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .season-tag .lb{ font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--mute); }
+  @media(max-width:640px){ .season-tag{ display:none; } }
+
+  /* strip of stats under hero */
+  .stripe{ display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid var(--line);
+    background:var(--panel); }
+  .stripe div{ padding:18px 24px; border-right:1px solid var(--line); }
+  .stripe div:last-child{ border-right:none; }
+  .stripe .n{ font-family:'Barlow Condensed',sans-serif; font-size:30px; font-weight:700; line-height:1;
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .stripe .k{ font-size:12px; color:var(--mute); letter-spacing:.1em; text-transform:uppercase; margin-top:4px; }
+  @media(max-width:640px){ .stripe{ grid-template-columns:1fr; } .stripe div{ border-right:none; border-bottom:1px solid var(--line); } }
+
+  /* ---- cards / panels ---- */
+  .card{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); }
+  .card.paper{ background:var(--panel); border-color:var(--line); color:var(--ink); }
+  .pad{ padding:26px; }
+  .section-title{ font-size:27px; font-weight:700; margin:0 0 4px;
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .section-sub{ color:var(--mute); font-size:14px; margin:0 0 22px; }
+
+  /* forms */
+  label.field{ display:block; margin-bottom:16px; }
+  label.field .lab{ display:block; font-size:12px; text-transform:uppercase; letter-spacing:.09em;
+    color:var(--mute); margin-bottom:6px; font-weight:600; }
+  input, select{
+    width:100%; background:var(--input-bg); border:1px solid var(--line); border-radius:10px;
+    padding:12px 13px; color:var(--ink); font-size:15px; font-family:inherit;
+  }
+  input::placeholder{ color:var(--mute); }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media(max-width:560px){ .row2{ grid-template-columns:1fr; } }
+
+  .msg{ padding:11px 14px; border-radius:10px; font-size:13.5px; margin-bottom:16px; display:none; }
+  .msg.err{ background:rgba(229,100,78,.13); border:1px solid var(--red); color:#ffb9ad; display:block; }
+  .msg.ok{ background:rgba(247,128,46,.14); border:1px solid var(--orange); color:#ffcb9e; display:block; }
+
+  .switch{ text-align:center; font-size:14px; color:var(--mute); margin-top:18px; }
+  .switch button{ background:none; border:none; color:var(--purple); font-weight:600; font-size:14px; }
+  .center-narrow{ max-width:460px; margin:0 auto; }
+
+  /* ---- squad sheet (signature) ---- */
+  .dash-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:24px; }
+  .tabs{ display:flex; gap:6px; margin-bottom:22px; flex-wrap:wrap; }
+  .tab{ padding:9px 16px; border-radius:10px; border:1px solid var(--line); background:transparent;
+    color:var(--mute); font-weight:600; font-size:13.5px; }
+  .tab.active{ background:var(--grad); color:#fff; border-color:transparent; }
+
+  .squad{ display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:15px; }
+  .player-card{ position:relative; background:var(--panel); border:1px solid var(--line);
+    border-radius:var(--radius); padding:20px; overflow:hidden; color:var(--ink); }
+  .player-card::before{ content:""; position:absolute; top:0; left:0; width:100%; height:5px;
+    background:var(--grad); }
+  .pc-num{ font-family:'Barlow Condensed',sans-serif; font-size:64px; font-weight:700; line-height:.78;
+    color:var(--orange); }
+  .pc-name{ font-size:21px; font-weight:600; margin:8px 0 2px; }
+  .pc-meta{ font-size:13px; color:var(--mute); }
+  .pc-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top:15px; }
+  .chip{ font-size:11px; padding:3px 10px; border-radius:20px; border:1px solid var(--line);
+    color:var(--mute); font-weight:600; }
+  .chip.grass{ border-color:var(--purple); color:var(--purple); }
+  .pc-actions{ display:flex; gap:8px; margin-top:18px; }
+  .pc-family{ font-size:11px; color:var(--mute); margin-top:12px; letter-spacing:.04em; }
+
+  .empty{ text-align:center; color:var(--mute); border:1px dashed var(--line); border-radius:var(--radius);
+    padding:50px 20px; }
+  .empty svg{ opacity:.4; margin-bottom:12px; }
+
+  /* admin table */
+  .admin-list{ display:flex; flex-direction:column; gap:10px; }
+  .admin-row{ display:flex; align-items:center; gap:14px; background:var(--panel); color:var(--ink);
+    border:1px solid var(--line); border-radius:12px; padding:13px 16px; }
+  .admin-row .who{ flex:1; min-width:0; }
+  .admin-row .who .nm{ font-weight:600; }
+  .admin-row .who .em{ font-size:12.5px; color:var(--mute); }
+  .admin-row .count{ font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:700; color:var(--orange); }
+
+  /* modal */
+  .modal-bg{ position:fixed; inset:0; background:rgba(5,3,10,.78); backdrop-filter:blur(3px);
+    display:none; align-items:flex-start; justify-content:center; padding:40px 18px; z-index:50; overflow:auto; }
+  .modal-bg.show{ display:flex; }
+  .modal{ width:100%; max-width:540px; }
+  .modal-x{ background:none; border:none; color:var(--mute); font-size:24px; line-height:1; }
+
+  .foot-note{ margin-top:34px; font-size:12.5px; color:var(--mute); border-top:1px solid var(--line);
+    padding-top:18px; }
+  .foot-note b{ color:var(--orange); }
+
+  .hidden{ display:none !important; }
+  .toast{ position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--grad); color:#fff; padding:13px 22px; border-radius:11px; font-weight:600;
+    font-size:14px; opacity:0; transition:.25s; z-index:80; pointer-events:none; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- reusable gradient def for the OPEN spotlight mark -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><linearGradient id="og" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#F7802E"/><stop offset="1" stop-color="#8B4CF0"/></linearGradient></defs>
+</svg>
+
+<!-- ============ TOP BAR ============ -->
+<header class="top">
+  <div class="crest">
+    <svg width="34" height="34" viewBox="0 0 48 48" fill="none" aria-label="OPEN">
+      <circle cx="24" cy="24" r="20.16" stroke="url(#og)" stroke-width="2.6" opacity="0.4"/>
+      <circle cx="24" cy="24" r="13.44" stroke="url(#og)" stroke-width="2.9" opacity="0.7"/>
+      <circle cx="24" cy="24" r="5.28" fill="url(#og)"/>
+    </svg>
+  </div>
+  <div>
+    <div class="club-name disp"><span class="lc">OP</span><span class="ac">EN</span></div>
+    <div class="club-sub">Player Registration</div>
+  </div>
+  <div class="top-right">
+    <span class="whoami hidden" id="whoami"></span>
+    <button class="btn ghost sm hidden" id="logoutBtn">Log out</button>
+  </div>
+</header>
+
+<!-- ============ LANDING ============ -->
+<section id="landing">
+  <div class="hero">
+    <div class="season-tag" aria-hidden="true">
+      <div class="yr">2026</div><div class="lb">Spring Season</div>
+    </div>
+    <div class="hero-inner">
+      <span class="eyebrow">Registration is open</span>
+      <h1 class="disp">THE SEASON<br>STARTS <em>HERE.</em></h1>
+      <p>Create a parent account, register each of your players, and choose their age group. One home for the whole team — no paper forms, no lost emails.</p>
+      <div class="hero-cta">
+        <button class="btn" id="goRegister">Create parent account</button>
+        <button class="btn ghost" id="goLogin">Log in</button>
+      </div>
+    </div>
+    <div class="stripe">
+      <div><div class="n disp">7</div><div class="k">Age groups, U6–U18</div></div>
+      <div><div class="n disp">1</div><div class="k">Account per family</div></div>
+      <div><div class="n disp">5 min</div><div class="k">To register</div></div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="card paper pad" style="margin-top:8px">
+      <h2 class="section-title disp">How it works</h2>
+      <p class="section-sub">Three steps from here to on the pitch.</p>
+      <div class="squad" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">
+        <div>
+          <div class="pc-num disp">1</div>
+          <div class="pc-name">Make your account</div>
+          <div class="pc-meta">One login for your family — manage every player from the same place.</div>
+        </div>
+        <div>
+          <div class="pc-num disp">2</div>
+          <div class="pc-name">Add your players</div>
+          <div class="pc-meta">Name, birthday, age group, and shirt size. Add as many as you need.</div>
+        </div>
+        <div>
+          <div class="pc-num disp">3</div>
+          <div class="pc-name">You're on the roster</div>
+          <div class="pc-meta">Each player becomes a squad card. Club admins see the full roster.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AUTH ============ -->
+<section id="auth" class="hidden">
+  <div class="wrap">
+    <div class="card paper pad center-narrow" style="margin-top:24px">
+      <h2 class="section-title disp" id="authTitle">Create your account</h2>
+      <p class="section-sub" id="authSub">One account for your whole family.</p>
+
+      <div class="msg" id="authMsg"></div>
+
+      <div id="nameField">
+        <label class="field">
+          <span class="lab">Your name</span>
+          <input id="f_name" type="text" placeholder="e.g. Sam Rivera" autocomplete="name" />
+        </label>
+      </div>
+      <label class="field">
+        <span class="lab">Email</span>
+        <input id="f_email" type="email" placeholder="you@email.com" autocomplete="email" />
+      </label>
+      <label class="field">
+        <span class="lab">Password</span>
+        <input id="f_pass" type="password" placeholder="At least 6 characters" autocomplete="current-password" />
+      </label>
+
+      <button class="btn block" id="authSubmit">Create account</button>
+
+      <div class="switch">
+        <span id="switchText">Already registered?</span>
+        <button id="switchBtn">Log in</button>
+      </div>
+    </div>
+    <p class="foot-note center-narrow">
+      <b>Note:</b> accounts are real and stored securely in Supabase. If your project
+      requires email confirmation, check your inbox after creating an account.
+    </p>
+  </div>
+</section>
+
+<!-- ============ PARENT DASHBOARD ============ -->
+<section id="dashboard" class="hidden">
+  <div class="wrap">
+    <div class="dash-head">
+      <div>
+        <h2 class="section-title disp" id="dashHi">Your players</h2>
+        <p class="section-sub" id="dashSub">Everyone you've registered this season.</p>
+      </div>
+      <button class="btn" id="addPlayerBtn">+ Add a player</button>
+    </div>
+
+    <div id="squad" class="squad"></div>
+
+    <div id="emptyState" class="empty hidden">
+      <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6"/></svg>
+      <p>No players yet. Add your first player to get them on the roster.</p>
+      <button class="btn sm" id="addPlayerBtn2">+ Add a player</button>
+    </div>
+
+    <p class="foot-note">
+      <b>Note:</b> registrations are saved for real in Supabase, visible only to you and club admins.
+    </p>
+  </div>
+</section>
+
+<!-- ============ ADMIN DASHBOARD ============ -->
+<section id="admin" class="hidden">
+  <div class="wrap">
+    <div class="dash-head">
+      <div>
+        <h2 class="section-title disp">Club admin</h2>
+        <p class="section-sub">The whole club roster and account access, in one place.</p>
+      </div>
+      <div class="stripe" style="border:1px solid var(--line); border-radius:12px; overflow:hidden; min-width:280px">
+        <div><div class="n disp" id="stat-players">0</div><div class="k">Players</div></div>
+        <div><div class="n disp" id="stat-families">0</div><div class="k">Families</div></div>
+        <div><div class="n disp" id="stat-admins">0</div><div class="k">Admins</div></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-atab="roster">Full roster</button>
+      <button class="tab" data-atab="access">Admin access</button>
+    </div>
+
+    <!-- roster tab -->
+    <div id="atab-roster">
+      <div id="adminSquad" class="squad"></div>
+      <div id="adminEmpty" class="empty hidden">
+        <p>No players registered across the club yet.</p>
+      </div>
+    </div>
+
+    <!-- access tab -->
+    <div id="atab-access" class="hidden">
+      <div class="card paper pad" style="margin-bottom:18px">
+        <h3 class="section-title disp" style="font-size:20px; margin-bottom:4px">Grant admin access</h3>
+        <p class="section-sub">Only you can do this. Enter the email of an existing parent account to make them a club admin.</p>
+        <div class="msg" id="grantMsg"></div>
+        <div class="row2" style="grid-template-columns:1fr auto; align-items:end">
+          <label class="field" style="margin-bottom:0">
+            <span class="lab">Parent account email</span>
+            <input id="grantEmail" type="email" placeholder="coach@email.com" />
+          </label>
+          <button class="btn gold" id="grantBtn" style="height:46px">Make admin</button>
+        </div>
+      </div>
+
+      <h3 class="section-title disp" style="font-size:20px; margin:22px 0 12px">Current admins</h3>
+      <div id="adminList" class="admin-list"></div>
+    </div>
+
+    <p class="foot-note">
+      <b>Owner:</b> <span id="ownerLabel">—</span>. You're the club owner — the only account that can grant or remove admin access.
+    </p>
+  </div>
+</section>
+
+<!-- ============ SITE FOOTER ============ -->
+<footer style="padding:24px; text-align:center; border-top:1px solid var(--line); margin-top:20px">
+  <a href="privacy.html" style="color:var(--mute); font-size:13px">Privacy</a>
+</footer>
+
+<!-- ============ PLAYER MODAL ============ -->
+<div class="modal-bg" id="playerModal">
+  <div class="card paper modal">
+    <div class="pad">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px">
+        <h3 class="section-title disp" id="modalTitle" style="font-size:25px">Add a player</h3>
+        <button class="modal-x" id="modalClose" aria-label="Close">&times;</button>
+      </div>
+      <p class="section-sub">Tell us about your player.</p>
+
+      <div class="msg" id="playerMsg"></div>
+
+      <label class="field">
+        <span class="lab">Player's full name</span>
+        <input id="p_name" type="text" placeholder="e.g. Ana Rivera" />
+      </label>
+      <div class="row2">
+        <label class="field">
+          <span class="lab">Date of birth</span>
+          <input id="p_dob" type="date" />
+        </label>
+        <label class="field">
+          <span class="lab">Age group</span>
+          <select id="p_group">
+            <option value="">Select…</option>
+            <option>U6</option><option>U8</option><option>U10</option>
+            <option>U12</option><option>U14</option><option>U16</option><option>U18</option>
+          </select>
+        </label>
+      </div>
+      <div class="row2">
+        <label class="field">
+          <span class="lab">Preferred position</span>
+          <select id="p_pos">
+            <option value="">No preference</option>
+            <option>Goalkeeper</option><option>Defender</option>
+            <option>Midfielder</option><option>Forward</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="lab">Shirt size</span>
+          <select id="p_shirt">
+            <option value="">Select…</option>
+            <option>YXS</option><option>YS</option><option>YM</option>
+            <option>YL</option><option>AS</option><option>AM</option>
+          </select>
+        </label>
+      </div>
+      <label class="field">
+        <span class="lab">Emergency contact number</span>
+        <input id="p_contact" type="tel" placeholder="Phone we can reach on game day" />
+      </label>
+
+      <button class="btn block" id="savePlayer">Save player</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* =========================================================================
+   OPEN — player registration, wired to Supabase.
+
+   ROLES
+   -----
+   - "owner"  : the single club owner (you). Set by OWNER_EMAIL below. Only the
+                owner can grant or remove admin access.
+   - "admin"  : can see the full club roster. Granted by the owner.
+   - "parent" : default. Manages only their own family's players.
+
+   BACKEND
+   -------
+   Auth, profiles, and players all live in Supabase. The row-level security
+   policies on the 'profiles' and 'players' tables (set up per the Foundations
+   guide) are what actually enforce who can read/write what — the isOwner /
+   isAdmin checks in this file are for the UI only, not real security boundaries.
+   ========================================================================= */
+
+/* >>> SET THIS to the email you'll sign up with. That account becomes the club
+       owner automatically and gets admin powers no one can revoke. You still
+       need to run `update profiles set role = 'admin' where email = '...'`
+       once in the Supabase SQL editor for this email (Foundations guide, Step E) —
+       until then this account won't actually have admin rights server-side. */
+const OWNER_EMAIL = "openfilm.games@gmail.com";
+
+const SUPABASE_URL = "https://smgcxmrxpigguwvdeljl.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_jRadoQhfbXRwxqlzWYmIcA_it_FfZK8";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const $ = (id) => document.getElementById(id);
+
+async function fetchProfile(userId){
+  const { data, error } = await sb.from("profiles").select("*").eq("id", userId).maybeSingle();
+  if(error){ console.error(error); return null; }
+  return data;
+}
+
+let currentUser = null;
+let editingId = null;
+
+/* ---- helpers ------------------------------------------------------------ */
+function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function firstName(n){ return (n||"").split(" ")[0] || "Your"; }
+function isOwner(u){ return u && u.email === OWNER_EMAIL.toLowerCase(); }
+function isAdmin(u){ return u && (u.role === "admin" || isOwner(u)); }
+
+function show(view){
+  ["landing","auth","dashboard","admin"].forEach(v => $(v).classList.add("hidden"));
+  $(view).classList.remove("hidden");
+  window.scrollTo(0,0);
+}
+function showMsg(id, text, kind){ const el=$(id); el.textContent=text; el.className="msg "+kind; }
+function hideMsg(id){ $(id).className="msg"; }
+
+let toastTimer;
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2200); }
+
+function refreshTopBar(){
+  if(currentUser){
+    $("whoami").classList.remove("hidden");
+    $("logoutBtn").classList.remove("hidden");
+    const role = isOwner(currentUser) ? "admin" : (currentUser.role==="admin"?"admin":"parent");
+    const label = isOwner(currentUser) ? "Owner" : (role==="admin"?"Admin":"Parent");
+    $("whoami").innerHTML = "Signed in as <b>"+escapeHtml(currentUser.name)+"</b>"+
+      "<span class='rolebadge "+(role==="admin"?"admin":"parent")+"'>"+label+"</span>";
+  } else {
+    $("whoami").classList.add("hidden");
+    $("logoutBtn").classList.add("hidden");
+  }
+}
+
+/* ---- auth --------------------------------------------------------------- */
+let authMode = "register";
+function setAuthMode(mode){
+  authMode = mode;
+  const reg = mode === "register";
+  $("authTitle").textContent = reg ? "Create your account" : "Welcome back";
+  $("authSub").textContent   = reg ? "One account for your whole family." : "Log in to manage your players.";
+  $("authSubmit").textContent = reg ? "Create account" : "Log in";
+  $("nameField").classList.toggle("hidden", !reg);
+  $("switchText").textContent = reg ? "Already registered?" : "Need an account?";
+  $("switchBtn").textContent  = reg ? "Log in" : "Create one";
+  $("f_pass").setAttribute("autocomplete", reg ? "new-password" : "current-password");
+  hideMsg("authMsg");
+}
+
+async function handleAuth(){
+  const email = $("f_email").value.trim().toLowerCase();
+  const pass  = $("f_pass").value;
+  const name  = $("f_name").value.trim();
+
+  if(!email || !pass){ return showMsg("authMsg","Enter your email and password.","err"); }
+  if(authMode==="register" && !name){ return showMsg("authMsg","Please tell us your name.","err"); }
+  if(authMode==="register" && pass.length<6){ return showMsg("authMsg","Password needs at least 6 characters.","err"); }
+
+  if(authMode==="register"){
+    const { data, error } = await sb.auth.signUp({
+      email, password: pass,
+      options: { data: { name } }
+    });
+    if(error){ return showMsg("authMsg", error.message, "err"); }
+    if(!data.session){
+      showMsg("authMsg","Account created — check your email to confirm it, then log in.","ok");
+      setAuthMode("login");
+      return;
+    }
+    currentUser = { id: data.user.id, name, email: data.user.email, role: "parent" };
+  } else {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if(error){ return showMsg("authMsg","Email or password doesn't match.","err"); }
+    const profile = await fetchProfile(data.user.id);
+    currentUser = {
+      id: data.user.id,
+      name: (profile && profile.name) || data.user.user_metadata?.name || "",
+      email: data.user.email,
+      role: (profile && profile.role) || "parent"
+    };
+  }
+  await routeAfterLogin();
+}
+
+async function logout(){
+  await sb.auth.signOut();
+  currentUser = null;
+  refreshTopBar();
+  show("landing");
+}
+
+async function routeAfterLogin(){
+  refreshTopBar();
+  if(isAdmin(currentUser)){ await enterAdmin(); }
+  else { await enterDashboard(); }
+}
+
+/* ---- parent dashboard --------------------------------------------------- */
+async function enterDashboard(){
+  $("dashHi").textContent = firstName(currentUser.name) + "'s players";
+  await renderSquad();
+  show("dashboard");
+}
+
+function dbToPlayer(row){
+  return { id: row.id, name: row.name, dob: row.dob, group: row.age_group,
+    pos: row.position, shirt: row.shirt_size, contact: row.emergency_contact };
+}
+
+async function renderSquad(){
+  const { data, error } = await sb.from("players").select("*")
+    .eq("parent_id", currentUser.id).order("created_at");
+  const players = (error ? [] : data).map(dbToPlayer);
+  const squad = $("squad"); squad.innerHTML = "";
+  $("emptyState").classList.toggle("hidden", players.length>0);
+  players.forEach((p,i)=> squad.appendChild(playerCard(p,i,true)));
+  bindCardActions(squad);
+}
+
+function playerCard(p, i, owned){
+  const card = document.createElement("div");
+  card.className = "player-card";
+  const num = String(i+1).padStart(2,"0");
+  card.innerHTML = `
+    <div class="pc-num disp">${num}</div>
+    <div class="pc-name">${escapeHtml(p.name)}</div>
+    <div class="pc-meta">${escapeHtml(p.group||"—")} &middot; ${escapeHtml(p.pos||"Any position")}</div>
+    <div class="pc-tags">
+      ${p.shirt ? `<span class="chip">Shirt ${escapeHtml(p.shirt)}</span>`:""}
+      ${p.dob ? `<span class="chip">${ageFrom(p.dob)}</span>`:""}
+      <span class="chip grass">Registered</span>
+    </div>
+    ${p._family ? `<div class="pc-family">Family: ${escapeHtml(p._family)}</div>`:""}
+    ${owned ? `<div class="pc-actions">
+      <button class="btn ghost sm onpaper" data-edit="${p.id}">Edit</button>
+      <button class="btn danger sm" data-del="${p.id}">Remove</button>
+    </div>`:""}`;
+  return card;
+}
+function bindCardActions(root){
+  root.querySelectorAll("[data-edit]").forEach(b=> b.onclick=()=>openPlayerModal(b.getAttribute("data-edit")));
+  root.querySelectorAll("[data-del]").forEach(b=> b.onclick=()=>removePlayer(b.getAttribute("data-del")));
+}
+function ageFrom(dob){
+  const d=new Date(dob); if(isNaN(d)) return "";
+  const yrs=Math.floor((Date.now()-d.getTime())/(365.25*24*3600*1000));
+  return (yrs>=0&&yrs<30)?("Age "+yrs):"";
+}
+
+/* ---- player add/edit ---------------------------------------------------- */
+function openPlayerModal(id){
+  editingId = id||null; hideMsg("playerMsg");
+  $("modalTitle").textContent = id ? "Edit player" : "Add a player";
+  ["p_name","p_dob","p_group","p_pos","p_shirt","p_contact"].forEach(f=>$(f).value="");
+  if(id){
+    sb.from("players").select("*").eq("id", id).maybeSingle().then(({data})=>{
+      if(!data) return;
+      const p = dbToPlayer(data);
+      $("p_name").value=p.name||""; $("p_dob").value=p.dob||""; $("p_group").value=p.group||"";
+      $("p_pos").value=p.pos||""; $("p_shirt").value=p.shirt||""; $("p_contact").value=p.contact||"";
+    });
+  }
+  $("playerModal").classList.add("show");
+}
+function closePlayerModal(){ $("playerModal").classList.remove("show"); editingId=null; }
+
+async function savePlayer(){
+  const name=$("p_name").value.trim(); const group=$("p_group").value;
+  if(!name) return showMsg("playerMsg","Please enter the player's name.","err");
+  if(!group) return showMsg("playerMsg","Please choose an age group.","err");
+  const data={ name, dob:$("p_dob").value||null, age_group:group, position:$("p_pos").value,
+    shirt_size:$("p_shirt").value, emergency_contact:$("p_contact").value.trim() };
+  let error;
+  if(editingId){
+    ({ error } = await sb.from("players").update(data).eq("id", editingId));
+  } else {
+    data.parent_id = currentUser.id;
+    // the logged-in parent registering their own child is the COPPA consent — see Foundations guide, Part 2
+    data.parent_consent = true;
+    ({ error } = await sb.from("players").insert(data));
+  }
+  if(error) return showMsg("playerMsg", error.message, "err");
+  closePlayerModal(); await renderSquad();
+  toast(editingId?"Player updated":name.split(" ")[0]+" is registered!");
+}
+async function removePlayer(id){
+  const { error } = await sb.from("players").delete().eq("id", id);
+  if(error){ toast("Couldn't remove player"); return; }
+  await renderSquad(); toast("Player removed");
+}
+
+/* ---- admin -------------------------------------------------------------- */
+async function enterAdmin(){
+  $("ownerLabel").textContent = OWNER_EMAIL;
+  await renderAdminRoster();
+  await renderAdminAccess();
+  setAdminTab("roster");
+  show("admin");
+}
+
+/* One query for all players, one for all profiles, joined client-side. Row-
+   level security on both tables is what actually restricts this to admins —
+   a non-admin hitting this code path just gets rows filtered down to none/own. */
+async function gatherAllPlayers(){
+  const [{ data: players, error: pErr }, { data: profiles, error: uErr }] = await Promise.all([
+    sb.from("players").select("*").order("created_at"),
+    sb.from("profiles").select("*")
+  ]);
+  const byId = {};
+  (profiles||[]).forEach(u => byId[u.id] = u);
+  const out = (players||[]).map(row => {
+    const p = dbToPlayer(row);
+    const owner = byId[row.parent_id];
+    p._family = owner ? owner.name : "";
+    return p;
+  });
+  return { profiles: profiles||[], players: out };
+}
+
+async function renderAdminRoster(){
+  const { profiles, players } = await gatherAllPlayers();
+  const grid = $("adminSquad"); grid.innerHTML = "";
+  $("adminEmpty").classList.toggle("hidden", players.length>0);
+  players.forEach((p,i)=> grid.appendChild(playerCard(p,i,false)));
+
+  const admins = profiles.filter(u => u.role==="admin" || u.email===OWNER_EMAIL.toLowerCase()).length;
+  $("stat-players").textContent = players.length;
+  $("stat-families").textContent = profiles.length;
+  $("stat-admins").textContent = admins;
+}
+
+async function renderAdminAccess(){
+  const { data: profiles } = await sb.from("profiles").select("*");
+  const list = $("adminList"); list.innerHTML = "";
+  const admins = (profiles||[]).filter(u => u.role==="admin" || u.email===OWNER_EMAIL.toLowerCase());
+  if(!admins.length){ list.innerHTML = "<p style='color:var(--mute)'>No admins yet.</p>"; return; }
+  admins.forEach(u=>{
+    const owner = u.email===OWNER_EMAIL.toLowerCase();
+    const row=document.createElement("div"); row.className="admin-row";
+    row.innerHTML=`
+      <div class="who">
+        <div class="nm">${escapeHtml(u.name)} ${owner?'<span class="rolebadge admin">Owner</span>':'<span class="rolebadge admin">Admin</span>'}</div>
+        <div class="em">${escapeHtml(u.email)}</div>
+      </div>
+      ${owner ? '' : `<button class="btn danger sm" data-revoke="${escapeHtml(u.email)}">Revoke</button>`}`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll("[data-revoke]").forEach(b=> b.onclick=()=>revokeAdmin(b.getAttribute("data-revoke")));
+}
+
+/* Only the OWNER can grant/revoke, guarded here in the UI and — critically —
+   again by the "admin updates profiles" row-level security policy on the
+   server, which is the check that actually matters. */
+async function grantAdmin(){
+  if(!isOwner(currentUser)) return showMsg("grantMsg","Only the club owner can grant admin access.","err");
+  const email = $("grantEmail").value.trim().toLowerCase();
+  if(!email) return showMsg("grantMsg","Enter the parent's account email.","err");
+  const { data: existing } = await sb.from("profiles").select("*").eq("email", email).maybeSingle();
+  if(!existing) return showMsg("grantMsg","No account with that email yet. They must create a parent account first.","err");
+  if(existing.role==="admin") return showMsg("grantMsg","That account is already an admin.","ok");
+  const { error } = await sb.from("profiles").update({ role: "admin" }).eq("email", email);
+  if(error) return showMsg("grantMsg", error.message, "err");
+  $("grantEmail").value="";
+  showMsg("grantMsg", existing.name+" is now a club admin.","ok");
+  await renderAdminAccess(); await renderAdminRoster();
+}
+async function revokeAdmin(email){
+  if(!isOwner(currentUser)) return;
+  if(email===OWNER_EMAIL.toLowerCase()) return;
+  const { error } = await sb.from("profiles").update({ role: "parent" }).eq("email", email);
+  if(error){ toast("Couldn't revoke admin access"); return; }
+  toast("Admin access revoked"); await renderAdminAccess(); await renderAdminRoster();
+}
+
+function setAdminTab(tab){
+  document.querySelectorAll("[data-atab]").forEach(b=>b.classList.toggle("active", b.getAttribute("data-atab")===tab));
+  $("atab-roster").classList.toggle("hidden", tab!=="roster");
+  $("atab-access").classList.toggle("hidden", tab!=="access");
+}
+
+/* ---- wire up ------------------------------------------------------------ */
+$("goRegister").onclick = () => { setAuthMode("register"); show("auth"); };
+$("goLogin").onclick    = () => { setAuthMode("login");    show("auth"); };
+$("switchBtn").onclick  = () => setAuthMode(authMode==="register"?"login":"register");
+$("authSubmit").onclick = handleAuth;
+$("logoutBtn").onclick  = logout;
+$("addPlayerBtn").onclick  = () => openPlayerModal(null);
+$("addPlayerBtn2").onclick = () => openPlayerModal(null);
+$("savePlayer").onclick = savePlayer;
+$("modalClose").onclick = closePlayerModal;
+$("playerModal").onclick = (e)=>{ if(e.target===$("playerModal")) closePlayerModal(); };
+$("grantBtn").onclick = grantAdmin;
+document.querySelectorAll("[data-atab]").forEach(b=> b.onclick=()=>setAdminTab(b.getAttribute("data-atab")));
+document.addEventListener("keydown",(e)=>{
+  if(e.key==="Escape") closePlayerModal();
+  if(e.key==="Enter" && !$("auth").classList.contains("hidden")) handleAuth();
+});
+
+/* ---- restore session ---------------------------------------------------- */
+(async function init(){
+  const { data: { session } } = await sb.auth.getSession();
+  if(session){
+    const profile = await fetchProfile(session.user.id);
+    currentUser = {
+      id: session.user.id,
+      name: (profile && profile.name) || session.user.user_metadata?.name || "",
+      email: session.user.email,
+      role: (profile && profile.role) || "parent"
+    };
+    refreshTopBar();
+    await routeAfterLogin();
+    return;
+  }
+  show("landing");
+})();
+</script>
+</body>
+</html>

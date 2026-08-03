@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OPEN — logo directions</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap');
+  :root{
+    --bg:#0B0910; --bg2:#161122; --bg3:#0F0B17; --line:#2A2440;
+    --ink:#F5F2F8; --mute:#9A90AD; --faint:#5F5678;
+    --orange:#F7802E; --purple:#8B4CF0;
+    --orange-soft:rgba(247,128,46,.14); --purple-soft:rgba(139,76,240,.16);
+    --radius:16px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; }
+  body{ background:var(--bg); color:var(--ink); font-family:'Inter',system-ui,sans-serif;
+    line-height:1.6; min-height:100vh; -webkit-font-smoothing:antialiased; }
+  .disp{ font-family:'Barlow Condensed',sans-serif; }
+  button{ font-family:inherit; cursor:pointer; }
+  button:focus-visible{ outline:2px solid var(--orange); outline-offset:3px; }
+  .shell{ max-width:1120px; margin:0 auto; padding:0 26px; }
+
+  .bar{ display:flex; align-items:center; gap:12px; padding:20px 26px; max-width:1120px; margin:0 auto; }
+  .pill{ margin-left:auto; font-size:12px; color:var(--mute); border:1px solid var(--line);
+    padding:6px 13px; border-radius:30px; letter-spacing:.04em; }
+
+  .head{ padding:34px 0 10px; position:relative; overflow:hidden; }
+  .head-glow{ position:absolute; top:-180px; left:20%; width:700px; height:420px;
+    background:radial-gradient(ellipse at center, var(--purple-soft), transparent 70%); pointer-events:none; }
+  .head-glow.two{ left:auto; right:10%; background:radial-gradient(ellipse at center, var(--orange-soft), transparent 70%); }
+  .head .shell{ position:relative; z-index:1; }
+  .eyebrow{ display:inline-flex; align-items:center; gap:9px; font-size:12px; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--orange); font-weight:600; margin-bottom:18px; }
+  .eyebrow::before{ content:""; width:26px; height:2px; background:linear-gradient(90deg,var(--orange),var(--purple)); }
+  .head h1{ font-size:clamp(34px,5vw,52px); font-weight:700; margin:0 0 10px; letter-spacing:-.01em; }
+  .head h1 .g{ background:linear-gradient(100deg,var(--orange),var(--purple)); -webkit-background-clip:text;
+    background-clip:text; -webkit-text-fill-color:transparent; }
+  .head p{ color:var(--mute); font-size:16px; max-width:640px; margin:0; }
+
+  .modes{ display:flex; gap:10px; align-items:center; padding:26px 0 6px; flex-wrap:wrap; }
+  .modes .lb{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--faint); margin-right:4px; }
+  .mode-btn{ background:var(--bg2); border:1px solid var(--line); color:var(--mute); padding:8px 16px;
+    border-radius:10px; font-size:13px; font-weight:600; transition:.18s; }
+  .mode-btn:hover{ border-color:var(--faint); color:var(--ink); }
+  .mode-btn.active{ color:var(--ink); border-color:transparent;
+    background:linear-gradient(100deg,var(--orange),var(--purple)); }
+
+  .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:18px; padding:22px 0 20px; }
+  @media(max-width:760px){ .grid{ grid-template-columns:1fr; } }
+  .logo-card{ background:var(--bg2); border:1px solid var(--line); border-radius:var(--radius);
+    overflow:hidden; display:flex; flex-direction:column; }
+  .stage{ padding:44px 30px; display:flex; align-items:center; justify-content:center;
+    min-height:180px; background:radial-gradient(ellipse at center, rgba(255,255,255,.02), transparent 70%); }
+  .lockup{ display:flex; align-items:center; gap:14px; }
+  .wm{ font-size:38px; font-weight:800; letter-spacing:-.01em; font-family:'Barlow Condensed',sans-serif; }
+  .wm .lc{ color:var(--ink); }
+  .wm .ac{ background:linear-gradient(100deg,var(--orange),var(--purple)); -webkit-background-clip:text;
+    background-clip:text; -webkit-text-fill-color:transparent; }
+
+  .scale-row{ display:flex; align-items:center; gap:22px; padding:16px 24px; border-top:1px solid var(--line);
+    background:var(--bg3); }
+  .scale-row .k{ font-size:11px; color:var(--faint); letter-spacing:.14em; text-transform:uppercase; line-height:1.4; }
+  .scale-row .marks{ display:flex; align-items:center; gap:18px; background:#F5F2F8; border-radius:10px; padding:10px 16px; }
+
+  .meta{ border-top:1px solid var(--line); padding:18px 24px; display:flex; align-items:flex-start; gap:14px; }
+  .meta .num{ font-family:'Barlow Condensed',sans-serif; font-size:26px; font-weight:800; color:var(--faint); line-height:1; }
+  .meta .name{ font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:19px; letter-spacing:.03em; }
+  .meta .desc{ font-size:13.5px; color:var(--mute); margin-top:2px; }
+
+  .note{ background:var(--bg2); border:1px solid var(--line); border-radius:var(--radius); padding:26px 28px;
+    margin:8px 0 60px; }
+  .note h3{ margin:0 0 8px; font-size:19px; }
+  .note p{ color:var(--mute); font-size:14.5px; margin:0 0 10px; }
+  .note ul{ color:var(--mute); font-size:14.5px; margin:0; padding-left:20px; }
+  .note li{ margin-bottom:6px; }
+  .note b{ color:var(--ink); }
+  .chipline{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+  .cc{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--mute);
+    border:1px solid var(--line); border-radius:30px; padding:6px 13px; }
+  .cc .d{ width:13px; height:13px; border-radius:50%; }
+</style>
+</head>
+<body>
+
+  <div class="bar">
+    <div class="lockup">
+      <svg width="30" height="30" viewBox="0 0 40 40" id="barmark"></svg>
+      <span class="wm" style="font-size:22px"><span class="lc">OP</span><span class="ac">EN</span></span>
+    </div>
+    <span class="pill">Orange &times; Purple &middot; pick a mark</span>
+  </div>
+
+  <section class="head">
+    <div class="head-glow"></div>
+    <div class="head-glow two"></div>
+    <div class="shell">
+      <span class="eyebrow">The mark</span>
+      <h1>Five ways the <span class="g">O</span> becomes the logo.</h1>
+      <p>Orange and purple, used together &mdash; a two-tone identity that's harder to confuse with anyone else. Each direction turns the O of OPEN into the symbol and runs the gradient through it. Shown large, and small on light, so you can see it work as an app icon too.</p>
+
+      <div class="modes" id="modes">
+        <span class="lb">Color treatment</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="shell">
+    <div class="grid" id="grid"></div>
+
+    <div class="note">
+      <h3>The palette</h3>
+      <p>Two brand colors, one gradient. Orange brings energy and warmth (the game, the players); purple brings the premium, modern feel that sets it apart from the blue-heavy sports-tech crowd. Together they read as confident and different.</p>
+      <div class="chipline">
+        <span class="cc"><span class="d" style="background:#F7802E"></span> Orange &middot; #F7802E</span>
+        <span class="cc"><span class="d" style="background:#8B4CF0"></span> Purple &middot; #8B4CF0</span>
+        <span class="cc"><span class="d" style="background:linear-gradient(100deg,#F7802E,#8B4CF0)"></span> Gradient lockup</span>
+      </div>
+
+      <h3 style="margin-top:24px">Which mark &mdash; and how to choose</h3>
+      <ul>
+        <li><b>Aperture O</b> &mdash; a camera iris; the gradient blades make it shimmer. Says "film &amp; seeing" most literally, and the two-tone suits it beautifully. Most distinctive.</li>
+        <li><b>Play O</b> &mdash; open ring + play triangle, orange-to-purple sweep. Instantly "video," friendly, safe.</li>
+        <li><b>Open Ring O</b> &mdash; a ring with a gap, gradient along the stroke. "Open" made literal; cleanest at small sizes.</li>
+        <li><b>Spotlight O</b> &mdash; concentric rings from orange core to purple edge; ties to "spotlight the player."</li>
+        <li><b>Portal O</b> &mdash; nested rings opening into depth; most premium and abstract, best if you grow past soccer.</li>
+      </ul>
+      <p style="margin-top:12px">My pick for a two-tone brand: <b>Aperture</b> &mdash; the iris blades are made for a gradient and nobody else in this space looks like it &mdash; or <b>Open Ring</b> if you want the simplest, most scalable mark. Tell me which, and I'll set it as the header logo and app icon across the OPEN product and the registration site so everything matches.</p>
+    </div>
+  </div>
+
+<script>
+  const OR="#F7802E", PU="#8B4CF0";
+  const MODES = {
+    "Gradient":  {a:OR, b:PU, grad:true},
+    "Orange":    {a:OR, b:OR, grad:false},
+    "Purple":    {a:PU, b:PU, grad:false},
+    "Split":     {a:OR, b:PU, grad:false, split:true},
+  };
+  let mode = "Gradient";
+
+  function defs(id){
+    return `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="${OR}"/><stop offset="1" stop-color="${PU}"/></linearGradient></defs>`;
+  }
+  function stroke(gid){ return MODES[mode].grad ? `url(#${gid})` : MODES[mode].a; }
+  function stroke2(gid){ return MODES[mode].grad ? `url(#${gid})` : (MODES[mode].split? MODES[mode].b : MODES[mode].a); }
+
+  const MARKS = {
+    aperture:(s,gid)=>{
+      const cx=s/2, r=s*0.42, ir=s*0.17;
+      let blades="";
+      for(let i=0;i<6;i++){
+        const a0=(i*60)*Math.PI/180, a1=((i*60)+60)*Math.PI/180;
+        const x0=cx+Math.cos(a0)*r, y0=cx+Math.sin(a0)*r;
+        const x1=cx+Math.cos(a1)*ir, y1=cx+Math.sin(a1)*ir;
+        const col = MODES[mode].grad ? `url(#${gid})` : (MODES[mode].split ? (i%2?PU:OR) : MODES[mode].a);
+        blades+=`<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="${col}" stroke-width="${s*0.05}" stroke-linecap="round"/>`;
+      }
+      return `${defs(gid)}<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${stroke(gid)}" stroke-width="${s*0.075}"/>${blades}`;
+    },
+    play:(s,gid)=>{
+      const cx=s/2, r=s*0.42, t=s*0.16;
+      return `${defs(gid)}<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${stroke(gid)}" stroke-width="${s*0.085}"/>
+        <path d="M${cx-t*0.7} ${cx-t} L${cx+t} ${cx} L${cx-t*0.7} ${cx+t} Z" fill="${stroke2(gid)}"/>`;
+    },
+    ring:(s,gid)=>{
+      const cx=s/2, r=s*0.40;
+      return `${defs(gid)}<circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${stroke(gid)}" stroke-width="${s*0.10}"
+        stroke-linecap="round" stroke-dasharray="${2*Math.PI*r*0.80} ${2*Math.PI*r}" transform="rotate(-55 ${cx} ${cx})"/>`;
+    },
+    spotlight:(s,gid)=>{
+      const cx=s/2;
+      const outer = MODES[mode].grad? `url(#${gid})` : (MODES[mode].split?PU:MODES[mode].a);
+      const core  = MODES[mode].grad? `url(#${gid})` : (MODES[mode].split?OR:MODES[mode].a);
+      return `${defs(gid)}<circle cx="${cx}" cy="${cx}" r="${s*0.42}" fill="none" stroke="${outer}" stroke-width="${s*0.055}" opacity="0.4"/>
+        <circle cx="${cx}" cy="${cx}" r="${s*0.28}" fill="none" stroke="${outer}" stroke-width="${s*0.06}" opacity="0.7"/>
+        <circle cx="${cx}" cy="${cx}" r="${s*0.11}" fill="${core}"/>`;
+    },
+    portal:(s,gid)=>{
+      const cx=s/2;
+      const o = MODES[mode].grad? `url(#${gid})` : MODES[mode].a;
+      const m = MODES[mode].grad? `url(#${gid})` : (MODES[mode].split?PU:MODES[mode].a);
+      return `${defs(gid)}<circle cx="${cx}" cy="${cx}" r="${s*0.42}" fill="none" stroke="${o}" stroke-width="${s*0.075}"/>
+        <circle cx="${cx}" cy="${cx}" r="${s*0.27}" fill="none" stroke="${m}" stroke-width="${s*0.05}" opacity="0.6"/>
+        <circle cx="${cx}" cy="${cx}" r="${s*0.13}" fill="none" stroke="${m}" stroke-width="${s*0.035}" opacity="0.35"/>`;
+    },
+  };
+
+  const CARDS = [
+    {key:"aperture", name:"Aperture O", desc:"A camera iris — film & seeing, made literal."},
+    {key:"play",     name:"Play O",     desc:"Open ring + play triangle — instantly video."},
+    {key:"ring",     name:"Open Ring O",desc:"A ring with a gap — 'open' as the idea itself."},
+    {key:"spotlight",name:"Spotlight O",desc:"Concentric target — spotlight on the player."},
+    {key:"portal",   name:"Portal O",   desc:"An O with depth — open the game up."},
+  ];
+
+  function svg(size, key, gid){
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" fill="none">${MARKS[key](size,gid)}</svg>`;
+  }
+
+  function render(){
+    document.getElementById("barmark").innerHTML = MARKS.ring(40,"gbar");
+    const grid=document.getElementById("grid"); grid.innerHTML="";
+    CARDS.forEach((card,i)=>{
+      const el=document.createElement("div"); el.className="logo-card";
+      el.innerHTML=`
+        <div class="stage">
+          <div class="lockup">
+            ${svg(52, card.key, "g"+i+"a")}
+            <span class="wm"><span class="lc">OP</span><span class="ac">EN</span></span>
+          </div>
+        </div>
+        <div class="scale-row">
+          <span class="k">On light<br>icon sizes</span>
+          <div class="marks">
+            ${svg(40, card.key, "g"+i+"b")}
+            ${svg(28, card.key, "g"+i+"c")}
+            ${svg(18, card.key, "g"+i+"d")}
+          </div>
+        </div>
+        <div class="meta">
+          <span class="num disp">${i+1}</span>
+          <div>
+            <div class="name">${card.name}</div>
+            <div class="desc">${card.desc}</div>
+          </div>
+        </div>`;
+      grid.appendChild(el);
+    });
+  }
+
+  const modeWrap=document.getElementById("modes");
+  Object.keys(MODES).forEach((m,i)=>{
+    const b=document.createElement("button");
+    b.className="mode-btn"+(i===0?" active":""); b.textContent=m;
+    b.onclick=()=>{ mode=m; document.querySelectorAll(".mode-btn").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active"); render(); };
+    modeWrap.appendChild(b);
+  });
+
+  render();
+</script>
+</body>
+</html>
